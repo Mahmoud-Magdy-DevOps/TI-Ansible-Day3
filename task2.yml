@@ -1,0 +1,14 @@
+- name: Install webservers
+  gather_facts: true
+  hosts: webservers
+
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+      when: ansible_facts['distribution'] == "Ubuntu"
+
+    - name: Install apache
+      package:
+        name: httpd
+      when: ansible_facts['distribution'] == "CentOS"

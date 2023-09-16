@@ -1,0 +1,17 @@
+- name: play1
+  gather_facts: false
+  hosts: webservers
+  tasks:
+    - name: task1
+      command: echo "hello from task1"
+      register: my_result
+
+    - name: task2
+      debug:
+        msg: "{{my_result}}"
+
+    - name: Restart service 
+      sysvinit:
+        name: nginx
+        state: started
+      when: my_result.changed or not my_result.failed

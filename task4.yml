@@ -1,0 +1,30 @@
+- name: play1
+  hosts: webservers
+  become: true
+
+  vars:
+    package_name: nginx
+    files_to_copy:
+      - file_name: index.html
+      - file_name: styles.css
+      - file_name: script.js
+
+  tasks:
+    - name: Install package
+      package:
+        name: "{{ package_name }}"
+        state: present
+
+    - name: Copy files to destination
+      copy:
+        src: "{{ item.file_name }}"
+        dest: "/var/www/html/{{ item.file_name }}"
+      loop: "{{ files_to_copy }}"
+      notify: Restart service
+      changed_when: true
+
+  handlers:
+    - name: Restart service
+      sysvinit:
+        name: nginx
+        state: restarted

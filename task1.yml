@@ -1,0 +1,12 @@
+- name: Installing using loops
+  gather_facts: false
+  hosts: webservers
+  tasks:
+    - name: Task with loops
+      apt:
+        name: "{{ item.package_name }}"
+        state: "{{ item.package_state }}"
+      loop:
+       - { package_name: "nginx", package_state: "present" }
+       - { package_name: "sudo", package_state: "latest" }
+       - { package_name: "curl", package_state: "absent" }

@@ -1,0 +1,52 @@
+- name: play1
+  hosts: webservers
+  become: true
+
+  vars:
+    package_name: nginx
+    mycolor: "#333"
+    template_message: "Hello, world!"
+
+    files_to_copy:
+      - file_name: index.html
+      - file_name: styles.css
+      - file_name: script.js
+
+    template:
+      - template_file: index.html.j2
+      - template_file: index.css.j2
+
+  tasks:
+    - name: Install package
+      package:
+        name: "{{ package_name }}"
+        state: present
+
+    - name: template
+      template:
+        src: "{{ item.template_file }}"
+        dest: "/var/www/html/{{ item.template_file }}"
+      loop: "{{ template }}"
+      notify: 
+       - handler1
+       - handler2 
+      changed_when: true
+
+    - name: normal loop
+      copy:
+        src: "{{ item.file_name }}"
+        dest: "/var/www/html/{{ item.file_name }}"
+      loop: "{{ files_to_copy }}"
+      notify: handler2
+      changed_when: true
+
+  handlers:
+    - name: handler1
+      sysvinit:
+        name: nginx
+        state: started
+
+    - name: handler2
+      sysvinit:
+        name: nginx
+        state: restarted
